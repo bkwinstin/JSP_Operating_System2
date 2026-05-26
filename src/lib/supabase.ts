@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Hardcoding the credentials directly ignores the locked environment files
+const supabaseUrl = 'https://supabase.co';
+const supabaseAnonKey = 'sb_publishable_MZHSE5FgABcNKxhvSzpiwQ_vBpeEMur';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
