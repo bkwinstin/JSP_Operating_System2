@@ -92,22 +92,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signInWithGoogle() {
-  const { createClient } = await import('@supabase/supabase-js');
-  
-  const directClient = createClient(
-    'https://supabase.co',
-    'sb_publishable_MZH5E5FgA8cNKxhvSzpiwQ_vBpeEMur'
-  );
-
-  const { error } = await directClient.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: 'https://netlify.app'
-    }
-  });
-
-  if (error) throw error;
-}
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://jspos.netlify.app/dashboard'
+      }
+    });
+    if (error) throw error;
+  }
 
 
   async function signOut() {
