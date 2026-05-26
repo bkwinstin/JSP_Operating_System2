@@ -142,7 +142,7 @@ export function LoginPage() {
           <button
             type="button"
    onClick={() => {
-  window.location.href = 'https://supabase.co';
+  window.location.href = 'https://rgaombwzaotyhlmtokcj.supabase.co';
 }}
 
             style={{ width: '100%', padding: '11px', borderRadius: '8px', border: '1px solid rgba(255,255,255,.18)', background: 'rgba(255,255,255,.07)', color: '#fff', fontSize: '13px', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '10px' }}
