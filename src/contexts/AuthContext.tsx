@@ -92,13 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signInWithGoogle() {
-    const signInWithGoogle = async () => {
   const { createClient } = await import('@supabase/supabase-js');
   
-  // This bypasses all environment variables and secondary files entirely
   const directClient = createClient(
     'https://supabase.co',
-    'sb_publishable_MZHSE5FgABcNKxhvSzpiwQ_vBpeEMur'
+    'sb_publishable_MZH5E5FgA8cNKxhvSzpiwQ_vBpeEMur'
   );
 
   const { error } = await directClient.auth.signInWithOAuth({
@@ -109,9 +107,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   if (error) throw error;
-};
+}
 
-  }
 
   async function signOut() {
     await supabase.auth.signOut();
