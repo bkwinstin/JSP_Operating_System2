@@ -92,13 +92,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://netlify.app',
-      },
-    });
-    return { error: error as Error | null };
+    const signInWithGoogle = async () => {
+  const { createClient } = await import('@supabase/supabase-js');
+  
+  // This bypasses all environment variables and secondary files entirely
+  const directClient = createClient(
+    'https://supabase.co',
+    'sb_publishable_MZHSE5FgABcNKxhvSzpiwQ_vBpeEMur'
+  );
+
+  const { error } = await directClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://netlify.app'
+    }
+  });
+
+  if (error) throw error;
+};
+
   }
 
   async function signOut() {
