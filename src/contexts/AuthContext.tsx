@@ -8,11 +8,14 @@ interface AuthContextType {
   session: Session | null;
   profile: UserProfile | null;
   loading: boolean;
+  passwordRecoveryMode: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null; needsConfirmation: boolean }>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  sendPasswordResetEmail: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -22,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
 
   async function fetchProfile(userId: string): Promise<UserProfile | null> {
     const { data } = await supabase
@@ -43,6 +47,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
       setSession(sess);
       setUser(sess?.user ?? null);
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecoveryMode(true);
+        setLoading(false);
+        return;
+      }
 
       if (!sess?.user || event === 'SIGNED_OUT') {
         setProfile(null);
@@ -106,8 +116,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   }
 
+  async function sendPasswordResetEmail(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}`,
+    });
+    return { error: error as Error | null };
+  }
+
+  async function updatePassword(newPassword: string) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (!error) setPasswordRecoveryMode(false);
+    return { error: error as Error | null };
+  }
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, passwordRecoveryMode, signIn, signUp, signInWithGoogle, signOut, refreshProfile, sendPasswordResetEmail, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

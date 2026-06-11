@@ -38,7 +38,7 @@ import { AIChat } from './components/chat/AIChat';
 type View = 'home' | 'documents' | 'network' | 'admin';
 
 function MainApp() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, passwordRecoveryMode } = useAuth();
   const { jobs, loading: jobsLoading, fetchJobs } = useJobs();
 
   const [view, setView] = useState<View>('home');
@@ -58,7 +58,7 @@ function MainApp() {
     );
   }
 
-  if (!user || !profile) {
+  if (!user || !profile || passwordRecoveryMode) {
     return <LoginPage />;
   }
 
