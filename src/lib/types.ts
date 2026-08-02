@@ -71,6 +71,7 @@ export interface Document {
   file_name?: string;
   dropbox_url?: string;
   canva_url?: string;
+  asana_url?: string;
   node_key?: string;
   catalyst_key?: string;
   doc_date: string;

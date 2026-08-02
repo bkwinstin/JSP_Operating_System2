@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { Document } from '../../lib/types';
 import { supabase } from '../../lib/supabase';
-import { X, Download, Lock, Pencil, ExternalLink, Eye, Link, FileText, Palette } from 'lucide-react';
+import { X, Download, Lock, Pencil, ExternalLink, Eye, Link, FileText, Palette, CheckSquare } from 'lucide-react';
 
 interface NetworkNode { node_key: string; label: string; }
 
@@ -32,7 +32,7 @@ function getFnMeta(functionAreas: ConfigItem[], value: string) {
 function PreviewModal({ doc, onClose }: { doc: Document; onClose: () => void }) {
   const previewUrl = doc.dropbox_url ? toDropboxPreviewUrl(doc.dropbox_url) : null;
   const downloadUrl = doc.dropbox_url ? toDropboxDownloadUrl(doc.dropbox_url) : null;
-  const hasAny = previewUrl || downloadUrl || doc.canva_url;
+  const hasAny = previewUrl || downloadUrl || doc.canva_url || doc.asana_url;
 
   return (
     <div
@@ -71,6 +71,18 @@ function PreviewModal({ doc, onClose }: { doc: Document; onClose: () => void }) 
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
             >
               <Palette size={15} /> Open in Canva
+            </a>
+          )}
+          {doc.asana_url && (
+            <a
+              href={doc.asana_url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', borderRadius: '9px', background: '#F06A37', color: '#fff', fontSize: '13px', fontWeight: 700, fontFamily: 'Verdana,sans-serif', textDecoration: 'none', transition: 'opacity .15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.88'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; }}
+            >
+              <CheckSquare size={15} /> Open in Asana
             </a>
           )}
           {previewUrl && (
@@ -114,7 +126,7 @@ function EditDocModal({ doc, functionAreas, docTypes, accessLevels, networkNodes
   docTypes: ConfigItem[];
   accessLevels: ConfigItem[];
   networkNodes: NetworkNode[];
-  onSave: (fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string; canva_url?: string; node_key?: string; catalyst_key?: string }) => Promise<void>;
+  onSave: (fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string; canva_url?: string; asana_url?: string; node_key?: string; catalyst_key?: string }) => Promise<void>;
   onClose: () => void;
 }) {
   const linkedValue = doc.catalyst_key ? '__catalyst__' : (doc.node_key || '');
@@ -126,6 +138,7 @@ function EditDocModal({ doc, functionAreas, docTypes, accessLevels, networkNodes
     security_level: doc.security_level,
     dropbox_url: doc.dropbox_url || '',
     canva_url: doc.canva_url || '',
+    asana_url: doc.asana_url || '',
     linked: linkedValue,
   });
   const [saving, setSaving] = useState(false);
@@ -141,6 +154,7 @@ function EditDocModal({ doc, functionAreas, docTypes, accessLevels, networkNodes
       security_level: fields.security_level,
       dropbox_url: fields.dropbox_url.trim() || undefined,
       canva_url: fields.canva_url.trim() || undefined,
+      asana_url: fields.asana_url.trim() || undefined,
       node_key: fields.linked && fields.linked !== '__catalyst__' ? fields.linked : undefined,
       catalyst_key: fields.linked === '__catalyst__' ? 'field-catalyst' : undefined,
     });
@@ -169,6 +183,11 @@ function EditDocModal({ doc, functionAreas, docTypes, accessLevels, networkNodes
             <label style={labelStyle}>Canva Link</label>
             <input value={fields.canva_url} onChange={e => setFields(f => ({ ...f, canva_url: e.target.value }))} placeholder="https://www.canva.com/design/..." style={inputStyle} />
             <div style={{ fontSize: '9.5px', color: '#9C8878', marginTop: '3px' }}>In Canva, click Share → Copy link. Use a view-only or public link.</div>
+          </div>
+          <div>
+            <label style={labelStyle}>Asana Link</label>
+            <input value={fields.asana_url} onChange={e => setFields(f => ({ ...f, asana_url: e.target.value }))} placeholder="https://app.asana.com/..." style={inputStyle} />
+            <div style={{ fontSize: '9.5px', color: '#9C8878', marginTop: '3px' }}>In Asana, copy the link to the project, task, or board.</div>
           </div>
           <div>
             <label style={labelStyle}>Link to Network Map (optional)</label>
@@ -230,6 +249,7 @@ function DocCard({ doc, functionAreas, canSee, isAdmin, onPreview, onEdit, onDel
   const fc = getFnMeta(functionAreas, doc.function_area);
   const hasDropbox = !!doc.dropbox_url;
   const hasCanva = !!doc.canva_url;
+  const hasAsana = !!doc.asana_url;
   const downloadUrl = hasDropbox ? toDropboxDownloadUrl(doc.dropbox_url!) : null;
 
   if (!canSee) {
@@ -272,6 +292,11 @@ function DocCard({ doc, functionAreas, canSee, isAdmin, onPreview, onEdit, onDel
               <Palette size={11} /> Canva
             </a>
           )}
+          {hasAsana && (
+            <a href={doc.asana_url!} target="_blank" rel="noreferrer" style={{ padding: '4px 10px', borderRadius: '5px', fontSize: '10px', fontWeight: 700, cursor: 'pointer', border: '1px solid #F0B59A', background: '#FDE9DC', color: '#B54218', fontFamily: 'Verdana,sans-serif', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', transition: 'all .14s' }}>
+              <CheckSquare size={11} /> Asana
+            </a>
+          )}
           {hasDropbox && (
             <button onClick={onPreview} style={{ padding: '4px 10px', borderRadius: '5px', fontSize: '10px', fontWeight: 700, cursor: 'pointer', border: '1px solid #E4E2D6', background: '#F2F1E9', color: '#6A453A', fontFamily: 'Verdana,sans-serif', display: 'flex', alignItems: 'center', gap: '4px', transition: 'all .14s' }}>
               <Eye size={11} /> View
@@ -282,7 +307,7 @@ function DocCard({ doc, functionAreas, canSee, isAdmin, onPreview, onEdit, onDel
               <Download size={11} /> Download
             </a>
           )}
-          {!hasDropbox && !hasCanva && <span style={{ fontSize: '10px', color: '#C8C4B4', fontStyle: 'italic', padding: '4px 0' }}>No file linked</span>}
+          {!hasDropbox && !hasCanva && !hasAsana && <span style={{ fontSize: '10px', color: '#C8C4B4', fontStyle: 'italic', padding: '4px 0' }}>No file linked</span>}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -310,7 +335,7 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
   const [editModal, setEditModal] = useState<Document | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Document | null>(null);
   const [adding, setAdding] = useState(false);
-  const [newDoc, setNewDoc] = useState({ name: '', description: '', dropbox_url: '', canva_url: '', linked: '', function_area: '', doc_type: '', security_level: 'all' as 'all' | 'jsp_admin' | 'executive' });
+  const [newDoc, setNewDoc] = useState({ name: '', description: '', dropbox_url: '', canva_url: '', asana_url: '', linked: '', function_area: '', doc_type: '', security_level: 'all' as 'all' | 'jsp_admin' | 'executive' });
   const [networkNodes, setNetworkNodes] = useState<NetworkNode[]>([]);
   const isAdmin = profile?.role === 'admin';
 
@@ -329,7 +354,7 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
 
   async function handleAdd() {
     if (!newDoc.name.trim()) { showToast('Please enter a document name', 'error'); return; }
-    if (!newDoc.dropbox_url.trim() && !newDoc.canva_url.trim()) { showToast('Please add a Dropbox or Canva link', 'error'); return; }
+    if (!newDoc.dropbox_url.trim() && !newDoc.canva_url.trim() && !newDoc.asana_url.trim()) { showToast('Please add a Dropbox, Canva, or Asana link', 'error'); return; }
     if (!newDoc.function_area) { showToast('Please select a function area', 'error'); return; }
     setAdding(true);
     const err = await addDropboxDocument({
@@ -337,6 +362,7 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
       description: newDoc.description,
       dropbox_url: newDoc.dropbox_url.trim() || undefined,
       canva_url: newDoc.canva_url.trim() || undefined,
+      asana_url: newDoc.asana_url.trim() || undefined,
       function_area: newDoc.function_area,
       doc_type: newDoc.doc_type || defaultDocType,
       security_level: newDoc.security_level,
@@ -346,12 +372,12 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
     if (err) showToast('Failed to add document: ' + err.message, 'error');
     else {
       showToast('Document added');
-      setNewDoc({ name: '', description: '', dropbox_url: '', canva_url: '', linked: '', function_area: '', doc_type: '', security_level: 'all' });
+      setNewDoc({ name: '', description: '', dropbox_url: '', canva_url: '', asana_url: '', linked: '', function_area: '', doc_type: '', security_level: 'all' });
     }
     setAdding(false);
   }
 
-  async function handleEdit(doc: Document, fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string; canva_url?: string; node_key?: string; catalyst_key?: string }) {
+  async function handleEdit(doc: Document, fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string; canva_url?: string; asana_url?: string; node_key?: string; catalyst_key?: string }) {
     const err = await updateDocument(doc.id, fields);
     if (err) showToast('Save failed: ' + err.message, 'error');
     else { showToast('Document updated'); setEditModal(null); }
@@ -396,6 +422,11 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
                 <label style={labelStyle}>Canva Link</label>
                 <input value={newDoc.canva_url} onChange={e => setNewDoc(m => ({ ...m, canva_url: e.target.value }))} placeholder="https://www.canva.com/design/..." style={inputStyle} />
                 <div style={{ fontSize: '9.5px', color: '#9C8878', marginTop: '3px' }}>In Canva: Share → Copy link (view-only or public)</div>
+              </div>
+              <div>
+                <label style={labelStyle}>Asana Link</label>
+                <input value={newDoc.asana_url} onChange={e => setNewDoc(m => ({ ...m, asana_url: e.target.value }))} placeholder="https://app.asana.com/..." style={inputStyle} />
+                <div style={{ fontSize: '9.5px', color: '#9C8878', marginTop: '3px' }}>Copy the link to the Asana project, task, or board</div>
               </div>
             </div>
 

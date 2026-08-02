@@ -66,7 +66,19 @@ function DocAttachment({ doc, canSee }: { doc: Document; canSee: boolean }) {
           <ExternalLink size={10} /> Canva
         </a>
       )}
-      {doc.storage_url && !doc.canva_url && (
+      {doc.asana_url && (
+        <a
+          href={doc.asana_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          title="Open in Asana"
+          style={{ padding: '3px 7px', borderRadius: '4px', border: '1px solid #F0B59A', background: '#FDE9DC', color: '#B54218', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none', flexShrink: 0, fontSize: '9px', fontWeight: 700, fontFamily: 'Verdana,sans-serif' }}
+        >
+          <ExternalLink size={10} /> Asana
+        </a>
+      )}
+      {doc.storage_url && !doc.canva_url && !doc.asana_url && (
         <a
           href={doc.storage_url}
           target="_blank"
@@ -82,8 +94,9 @@ function DocAttachment({ doc, canSee }: { doc: Document; canSee: boolean }) {
 }
 
 function ToolAttachment({ tool, job, linkedDoc, canSeeDoc }: { tool: JobWhatTool; job: Job; linkedDoc?: Document; canSeeDoc?: (doc: Document) => boolean }) {
-  const docUrl = linkedDoc?.canva_url || linkedDoc?.dropbox_url || linkedDoc?.storage_url;
+  const docUrl = linkedDoc?.asana_url || linkedDoc?.canva_url || linkedDoc?.dropbox_url || linkedDoc?.storage_url;
   const isCanva = !!(linkedDoc?.canva_url);
+  const isAsana = !!(linkedDoc?.asana_url);
   const canAccess = linkedDoc ? (canSeeDoc ? canSeeDoc(linkedDoc) : true) : true;
 
   return (
@@ -112,12 +125,12 @@ function ToolAttachment({ tool, job, linkedDoc, canSeeDoc }: { tool: JobWhatTool
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
           title={`Open ${linkedDoc.name}`}
-          style={{ padding: '3px 7px', borderRadius: '4px', border: isCanva ? '1px solid #C4A3E8' : `1px solid ${job.color}40`, background: isCanva ? '#F3EAFF' : 'rgba(255,255,255,.6)', color: isCanva ? '#5B1AAA' : job.dark, display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none', flexShrink: 0, fontSize: '9px', fontWeight: 700, fontFamily: 'Verdana,sans-serif', transition: 'background .12s' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = isCanva ? '#EBD9FF' : '#fff'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = isCanva ? '#F3EAFF' : 'rgba(255,255,255,.6)'; }}
+          style={{ padding: '3px 7px', borderRadius: '4px', border: isAsana ? '1px solid #F0B59A' : isCanva ? '1px solid #C4A3E8' : `1px solid ${job.color}40`, background: isAsana ? '#FDE9DC' : isCanva ? '#F3EAFF' : 'rgba(255,255,255,.6)', color: isAsana ? '#B54218' : isCanva ? '#5B1AAA' : job.dark, display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none', flexShrink: 0, fontSize: '9px', fontWeight: 700, fontFamily: 'Verdana,sans-serif', transition: 'background .12s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = isAsana ? '#FBD3BC' : isCanva ? '#EBD9FF' : '#fff'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = isAsana ? '#FDE9DC' : isCanva ? '#F3EAFF' : 'rgba(255,255,255,.6)'; }}
         >
           <ExternalLink size={10} />
-          {isCanva ? 'Canva' : 'Open'}
+          {isAsana ? 'Asana' : isCanva ? 'Canva' : 'Open'}
         </a>
       )}
     </div>

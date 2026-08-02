@@ -83,6 +83,7 @@ export function useDocuments() {
     security_level: 'all' | 'jsp_admin' | 'executive';
     dropbox_url?: string;
     canva_url?: string;
+    asana_url?: string;
     node_key?: string;
     catalyst_key?: string;
   }) {
@@ -125,6 +126,7 @@ export function useDocuments() {
     security_level: 'all' | 'jsp_admin' | 'executive';
     dropbox_url?: string;
     canva_url?: string;
+    asana_url?: string;
     node_key?: string;
     catalyst_key?: string;
   }) {
