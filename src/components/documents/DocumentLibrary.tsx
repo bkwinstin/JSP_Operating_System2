@@ -126,7 +126,7 @@ function EditDocModal({ doc, functionAreas, docTypes, accessLevels, networkNodes
   docTypes: ConfigItem[];
   accessLevels: ConfigItem[];
   networkNodes: NetworkNode[];
-  onSave: (fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string; canva_url?: string; asana_url?: string; node_key?: string; catalyst_key?: string }) => Promise<void>;
+  onSave: (fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string | null; canva_url?: string | null; asana_url?: string | null; node_key?: string | null; catalyst_key?: string | null }) => Promise<void>;
   onClose: () => void;
 }) {
   const linkedValue = doc.catalyst_key ? '__catalyst__' : (doc.node_key || '');
@@ -152,11 +152,11 @@ function EditDocModal({ doc, functionAreas, docTypes, accessLevels, networkNodes
       function_area: fields.function_area,
       doc_type: fields.doc_type,
       security_level: fields.security_level,
-      dropbox_url: fields.dropbox_url.trim() || undefined,
-      canva_url: fields.canva_url.trim() || undefined,
-      asana_url: fields.asana_url.trim() || undefined,
-      node_key: fields.linked && fields.linked !== '__catalyst__' ? fields.linked : undefined,
-      catalyst_key: fields.linked === '__catalyst__' ? 'field-catalyst' : undefined,
+      dropbox_url: fields.dropbox_url.trim() || null,
+      canva_url: fields.canva_url.trim() || null,
+      asana_url: fields.asana_url.trim() || null,
+      node_key: fields.linked && fields.linked !== '__catalyst__' ? fields.linked : null,
+      catalyst_key: fields.linked === '__catalyst__' ? 'field-catalyst' : null,
     });
     setSaving(false);
   }
@@ -360,14 +360,14 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
     const err = await addDropboxDocument({
       name: newDoc.name,
       description: newDoc.description,
-      dropbox_url: newDoc.dropbox_url.trim() || undefined,
-      canva_url: newDoc.canva_url.trim() || undefined,
-      asana_url: newDoc.asana_url.trim() || undefined,
+      dropbox_url: newDoc.dropbox_url.trim() || null,
+      canva_url: newDoc.canva_url.trim() || null,
+      asana_url: newDoc.asana_url.trim() || null,
       function_area: newDoc.function_area,
       doc_type: newDoc.doc_type || defaultDocType,
       security_level: newDoc.security_level,
-      node_key: newDoc.linked && newDoc.linked !== '__catalyst__' ? newDoc.linked : undefined,
-      catalyst_key: newDoc.linked === '__catalyst__' ? 'field-catalyst' : undefined,
+      node_key: newDoc.linked && newDoc.linked !== '__catalyst__' ? newDoc.linked : null,
+      catalyst_key: newDoc.linked === '__catalyst__' ? 'field-catalyst' : null,
     });
     if (err) showToast('Failed to add document: ' + err.message, 'error');
     else {
@@ -377,7 +377,7 @@ export function DocumentLibrary({ onClose }: DocumentLibraryProps) {
     setAdding(false);
   }
 
-  async function handleEdit(doc: Document, fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string; canva_url?: string; asana_url?: string; node_key?: string; catalyst_key?: string }) {
+  async function handleEdit(doc: Document, fields: { name: string; description: string; function_area: string; doc_type: string; security_level: 'all' | 'jsp_admin' | 'executive'; dropbox_url?: string | null; canva_url?: string | null; asana_url?: string | null; node_key?: string | null; catalyst_key?: string | null }) {
     const err = await updateDocument(doc.id, fields);
     if (err) showToast('Save failed: ' + err.message, 'error');
     else { showToast('Document updated'); setEditModal(null); }

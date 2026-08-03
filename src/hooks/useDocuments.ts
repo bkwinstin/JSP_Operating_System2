@@ -81,11 +81,11 @@ export function useDocuments() {
     function_area: string;
     doc_type: string;
     security_level: 'all' | 'jsp_admin' | 'executive';
-    dropbox_url?: string;
-    canva_url?: string;
-    asana_url?: string;
-    node_key?: string;
-    catalyst_key?: string;
+    dropbox_url?: string | null;
+    canva_url?: string | null;
+    asana_url?: string | null;
+    node_key?: string | null;
+    catalyst_key?: string | null;
   }) {
     const { error } = await supabase.from('documents').insert({
       ...meta,
@@ -124,11 +124,11 @@ export function useDocuments() {
     function_area: string;
     doc_type: string;
     security_level: 'all' | 'jsp_admin' | 'executive';
-    dropbox_url?: string;
-    canva_url?: string;
-    asana_url?: string;
-    node_key?: string;
-    catalyst_key?: string;
+    dropbox_url?: string | null;
+    canva_url?: string | null;
+    asana_url?: string | null;
+    node_key?: string | null;
+    catalyst_key?: string | null;
   }) {
     const { error } = await supabase.from('documents').update(fields).eq('id', id);
     if (!error) await fetchDocuments();
