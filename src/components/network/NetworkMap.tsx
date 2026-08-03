@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { X, FileText, Download, Eye, ChevronDown } from 'lucide-react';
+import { X, FileText, Download, Eye, ChevronDown, Palette, CheckSquare, Link as LinkIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Document, Job } from '../../lib/types';
@@ -116,6 +116,16 @@ function DocPreviewModal({ doc, onClose }: { doc: Document; onClose: () => void 
           </button>
         </div>
         <div style={{ padding: '20px 24px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {doc.canva_url && (
+            <a href={doc.canva_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', borderRadius: '9px', background: '#7D2AE8', color: '#fff', fontSize: '13px', fontWeight: 700, fontFamily: 'Verdana,sans-serif', textDecoration: 'none' }}>
+              <Palette size={15} /> Open in Canva
+            </a>
+          )}
+          {doc.asana_url && (
+            <a href={doc.asana_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', borderRadius: '9px', background: '#F06A37', color: '#fff', fontSize: '13px', fontWeight: 700, fontFamily: 'Verdana,sans-serif', textDecoration: 'none' }}>
+              <CheckSquare size={15} /> Open in Asana
+            </a>
+          )}
           {previewUrl && (
             <a href={previewUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 20px', borderRadius: '9px', background: '#0061FF', color: '#fff', fontSize: '13px', fontWeight: 700, fontFamily: 'Verdana,sans-serif', textDecoration: 'none' }}>
               <Eye size={15} /> Preview in Dropbox
@@ -126,10 +136,9 @@ function DocPreviewModal({ doc, onClose }: { doc: Document; onClose: () => void 
               <Download size={15} /> Download File
             </a>
           )}
-          {!previewUrl && !downloadUrl && (
+          {!previewUrl && !downloadUrl && !doc.canva_url && !doc.asana_url && (
             <div style={{ textAlign: 'center', padding: '16px', color: '#9C8878', fontSize: '12px' }}>No file linked</div>
           )}
-          <div style={{ fontSize: '10px', color: '#C8C4B4', textAlign: 'center' }}>Opens in a new tab via Dropbox</div>
         </div>
       </div>
     </div>
@@ -318,6 +327,16 @@ function NodeDrawerContent({ node, docs, canSee, connectedNames, onPreview }: {
                   <div style={{ fontSize: '9px', fontWeight: 700, color: cl.ls, marginTop: '2px' }}>{d.doc_type}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                  {d.canva_url && (
+                    <a href={d.canva_url} target="_blank" rel="noreferrer" title="Open in Canva" style={{ padding: '5px 7px', borderRadius: '6px', border: '1px solid #C4A3E8', background: '#F3EAFF', color: '#5B1AAA', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                      <Palette size={11} />
+                    </a>
+                  )}
+                  {d.asana_url && (
+                    <a href={d.asana_url} target="_blank" rel="noreferrer" title="Open in Asana" style={{ padding: '5px 7px', borderRadius: '6px', border: '1px solid #F0B59A', background: '#FDE9DC', color: '#B54218', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                      <CheckSquare size={11} />
+                    </a>
+                  )}
                   {d.dropbox_url && (
                     <button onClick={() => onPreview(d)} style={{ padding: '5px 8px', borderRadius: '6px', border: '1px solid #E4E2D6', background: '#F2F1E9', color: '#6A453A', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: 700, fontFamily: '"Century Gothic","Trebuchet MS",sans-serif' }}>
                       <Eye size={11} /> View
@@ -383,6 +402,16 @@ function PrincipleAccordion({ title, body, index, light, dark, docs, canSeeDoc }
                     {d.description && <div style={{ fontSize: '9px', color: '#9C8878', lineHeight: 1.4 }}>{d.description}</div>}
                   </div>
                   <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: '#E4E2D6', color: '#6A453A', flexShrink: 0 }}>{d.doc_type}</span>
+                  {d.canva_url && (
+                    <a href={d.canva_url} target="_blank" rel="noreferrer" title="Open in Canva" style={{ padding: '3px 6px', borderRadius: '4px', border: '1px solid #C4A3E8', background: '#F3EAFF', color: '#5B1AAA', textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                      <Palette size={10} />
+                    </a>
+                  )}
+                  {d.asana_url && (
+                    <a href={d.asana_url} target="_blank" rel="noreferrer" title="Open in Asana" style={{ padding: '3px 6px', borderRadius: '4px', border: '1px solid #F0B59A', background: '#FDE9DC', color: '#B54218', textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                      <CheckSquare size={10} />
+                    </a>
+                  )}
                   {d.dropbox_url && (
                     <a href={toDropboxDownloadUrl(d.dropbox_url)} target="_blank" rel="noreferrer" style={{ padding: '3px 7px', borderRadius: '4px', border: '1px solid #E4E2D6', background: '#F2F1E9', color: '#6A453A', textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                       <Download size={10} />
@@ -461,6 +490,16 @@ function JobHowSection({ job, canSeeDoc }: { job: Job; canSeeDoc: (d: Document) 
                   {d.description && <div style={{ fontSize: '9px', color: '#9C8878', lineHeight: 1.4 }}>{d.description}</div>}
                 </div>
                 <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: '#E4E2D6', color: '#6A453A', flexShrink: 0 }}>{d.doc_type}</span>
+                {d.canva_url && (
+                  <a href={d.canva_url} target="_blank" rel="noreferrer" title="Open in Canva" style={{ padding: '3px 6px', borderRadius: '4px', border: '1px solid #C4A3E8', background: '#F3EAFF', color: '#5B1AAA', textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                    <Palette size={10} />
+                  </a>
+                )}
+                {d.asana_url && (
+                  <a href={d.asana_url} target="_blank" rel="noreferrer" title="Open in Asana" style={{ padding: '3px 6px', borderRadius: '4px', border: '1px solid #F0B59A', background: '#FDE9DC', color: '#B54218', textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                    <CheckSquare size={10} />
+                  </a>
+                )}
                 {d.dropbox_url && (
                   <a href={toDropboxDownloadUrl(d.dropbox_url)} target="_blank" rel="noreferrer" style={{ padding: '3px 7px', borderRadius: '4px', border: '1px solid #E4E2D6', background: '#F2F1E9', color: '#6A453A', textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                     <Download size={10} />
@@ -601,6 +640,16 @@ function CatalystPanelContent({ info, docs, canSee, onPreview }: {
                   <div style={{ fontSize: '9px', fontWeight: 700, color: '#B8860B', marginTop: '2px' }}>{d.doc_type}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                  {d.canva_url && (
+                    <a href={d.canva_url} target="_blank" rel="noreferrer" title="Open in Canva" style={{ padding: '5px 7px', borderRadius: '6px', border: '1px solid #C4A3E8', background: '#F3EAFF', color: '#5B1AAA', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                      <Palette size={11} />
+                    </a>
+                  )}
+                  {d.asana_url && (
+                    <a href={d.asana_url} target="_blank" rel="noreferrer" title="Open in Asana" style={{ padding: '5px 7px', borderRadius: '6px', border: '1px solid #F0B59A', background: '#FDE9DC', color: '#B54218', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                      <CheckSquare size={11} />
+                    </a>
+                  )}
                   {d.dropbox_url && (
                     <button onClick={() => onPreview(d)} style={{ padding: '5px 8px', borderRadius: '6px', border: '1px solid #E4E2D6', background: '#F2F1E9', color: '#6A453A', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: 700, fontFamily: '"Century Gothic","Trebuchet MS",sans-serif' }}>
                       <Eye size={11} /> View
